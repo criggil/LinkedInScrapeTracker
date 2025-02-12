@@ -1,0 +1,37 @@
+{
+  "a6a98973-7fd4-4b52-baa1-407205830cf2": {
+    "name": "User Posts",
+    "criteria": {
+      "type": "user",
+      "usernames": [
+        "john_doe"
+      ]
+    },
+    "notify": true
+  },
+  "be4ad54e-7e1a-4da5-8948-055458eb8ea9": {
+    "name": "Tech Topics",
+    "criteria": {
+      "type": "topic",
+      "keywords": [
+        "AI",
+        "SEO"
+      ]
+    },
+    "notify": true
+  },
+  "0161020e-a431-4a8a-8673-591c707836a0": {
+    "name": "Content Writer Jobs",
+    "criteria": {
+      "type": "job",
+      "keywords": [
+        "content writer",
+        "B2B writer",
+        "hiring",
+        "looking for",
+        "job opportunity"
+      ]
+    },
+    "notify": true
+  }
+}

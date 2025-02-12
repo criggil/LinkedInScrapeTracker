@@ -1,0 +1,33 @@
+modules = ["python-3.11"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "LinkedIn Monitor"
+
+[[workflows.workflow]]
+name = "LinkedIn Monitor"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chmod +x linkedin_monitor.py && ./linkedin_monitor.py --list-searches"
+
+[deployment]
+run = ["sh", "-c", "chmod +x linkedin_monitor.py && ./linkedin_monitor.py --list-searches"]
