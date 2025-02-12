@@ -14,7 +14,7 @@ def setup_argparse():
     parser.add_argument('--process', '-p', action='store_true', help='Process posts and find matches')
     parser.add_argument('--view-matches', '-v', type=str, help='View matches for a specific search ID')
 
-    # New arguments for non-interactive search addition
+    # Arguments for non-interactive search addition
     parser.add_argument('--name', type=str, help='Name for the new search')
     parser.add_argument('--type', choices=['user', 'topic', 'job'], help='Type of search')
     parser.add_argument('--keywords', type=str, help='Keywords for topic/job search (comma-separated)')
@@ -22,6 +22,27 @@ def setup_argparse():
     parser.add_argument('--notify', action='store_true', help='Enable notifications for the search')
 
     return parser
+
+def load_json_file(file_path):
+    """
+    Load and parse JSON file with error handling
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            # Remove any potential BOM characters
+            if content.startswith('\ufeff'):
+                content = content[1:]
+            # Parse JSON
+            data = json.loads(content)
+            # Handle both array and object formats
+            return data if isinstance(data, list) else [data]
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON file: {str(e)}")
+        return None
+    except Exception as e:
+        print(f"Error loading input file: {str(e)}")
+        return None
 
 def add_new_search(config_manager, args):
     if not args.name or not args.type:
@@ -77,12 +98,8 @@ def main():
             print("Error: Please provide an input JSON file with --input")
             return
 
-        try:
-            with open(args.input, 'r') as f:
-                data = json.load(f)
-                posts = data.get('posts', [])
-        except Exception as e:
-            print(f"Error loading input file: {e}")
+        posts = load_json_file(args.input)
+        if not posts:
             return
 
         searches = config_manager.get_all_searches()
