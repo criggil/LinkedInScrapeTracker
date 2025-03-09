@@ -16,7 +16,8 @@
       "keywords": [
         "AI",
         "SEO",
-        "joy"
+        "joy",
+        "Positive"
       ]
     },
     "notify": true
@@ -31,6 +32,16 @@
         "hiring",
         "looking for",
         "job opportunity"
+      ]
+    },
+    "notify": true
+  },
+  "423c4d49-81af-4327-b729-77891ae510de": {
+    "name": "Positive",
+    "criteria": {
+      "type": "topic",
+      "keywords": [
+        "positive"
       ]
     },
     "notify": true

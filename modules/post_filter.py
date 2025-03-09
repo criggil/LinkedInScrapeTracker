@@ -33,8 +33,15 @@ class PostFilter:
             if criteria['type'] == 'job':
                 keywords = list(keywords) + ['hiring', 'looking for', 'job opportunity']
 
-            return any(keyword.lower().strip() in content 
-                      for keyword in keywords)
+            # Print debug information for keywords and content
+            print(f"Keywords to match: {keywords}")
+            print(f"Post content: {content}")
+
+            matches = [kw for kw in keywords if kw.lower().strip() in content]
+            if matches:
+                print(f"Matched keywords: {matches}")
+
+            return bool(matches)
 
         return False
 

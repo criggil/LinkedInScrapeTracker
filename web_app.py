@@ -33,9 +33,11 @@ def add_search():
 
         criteria = {'type': search_type}
         if search_type == 'user':
-            criteria['usernames'] = request.form['usernames'].split(',')
+            usernames = request.form.get('usernames', '').strip()
+            criteria['usernames'] = [u.strip() for u in usernames.split(',') if u.strip()]
         else:
-            criteria['keywords'] = request.form['keywords'].split(',')
+            keywords = request.form.get('keywords', '').strip()
+            criteria['keywords'] = [k.strip() for k in keywords.split(',') if k.strip()]
 
         config_manager.add_search(name, criteria, notify)
         flash('Search added successfully!', 'success')
@@ -91,7 +93,12 @@ def search():
 
         if search:
             posts = load_sample_posts()
+            # Print debug information
+            print(f"Search criteria: {search['criteria']}")
+            print(f"Number of posts to process: {len(posts)}")
+
             matches = post_filter.filter_posts(posts, search['criteria'])
+            print(f"Number of matches found: {len(matches)}")
 
             # Replace existing matches with new ones
             storage.save_matches(search_id, matches, replace=True)
