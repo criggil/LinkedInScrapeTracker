@@ -33,5 +33,16 @@
       ]
     },
     "notify": true
+  },
+  "ce28f51e-e991-405c-9a17-2eedcac332da": {
+    "name": "Design freelance",
+    "criteria": {
+      "type": "job",
+      "keywords": [
+        "designer",
+        " freelancer"
+      ]
+    },
+    "notify": true
   }
 }

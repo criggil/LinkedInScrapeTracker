@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Search Posts</h2>
+<form method="POST" action="{{ url_for('search') }}">
+    <div class="form-group">
+        <label for="search_id">Select a Saved Search:</label>
+        <select id="search_id" name="search_id" required>
+            {% for id, search in searches.items() %}
+            <option value="{{ id }}">{{ search.name }} ({{ search.criteria.type }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn">Search Posts</button>
+</form>
+{% endblock %}
