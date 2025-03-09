@@ -38,9 +38,42 @@ def add_search():
             criteria['keywords'] = request.form['keywords'].split(',')
 
         config_manager.add_search(name, criteria, notify)
+        flash('Search added successfully!', 'success')
         return redirect(url_for('index'))
 
     return render_template('add_search.html')
+
+@app.route('/edit_search/<search_id>', methods=['GET', 'POST'])
+def edit_search(search_id):
+    search = config_manager.get_search(search_id)
+    if not search:
+        flash('Search not found!', 'error')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        name = request.form['name']
+        search_type = request.form['type']
+        notify = 'notify' in request.form
+
+        criteria = {'type': search_type}
+        if search_type == 'user':
+            criteria['usernames'] = request.form['usernames'].split(',')
+        else:
+            criteria['keywords'] = request.form['keywords'].split(',')
+
+        config_manager.update_search(search_id, name=name, criteria=criteria, notify=notify)
+        flash('Search updated successfully!', 'success')
+        return redirect(url_for('index'))
+
+    return render_template('edit_search.html', search=search, search_id=search_id)
+
+@app.route('/delete_search/<search_id>')
+def delete_search(search_id):
+    if config_manager.delete_search(search_id):
+        flash('Search deleted successfully!', 'success')
+    else:
+        flash('Error deleting search!', 'error')
+    return redirect(url_for('index'))
 
 @app.route('/view_matches/<search_id>')
 def view_matches(search_id):

@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "post1",
+    "author": "john_doe",
+    "content": "Just published a new article about Artificial Intelligence and its impact on business. #AI #Technology",
+    "timestamp": "2025-02-12T10:00:00Z",
+    "matched_at": "2025-03-09T11:19:40.168518"
+  }
+]

@@ -65,13 +65,23 @@ class ConfigManager:
         """
         if search_id not in self.config:
             return False
-        
+
         if name is not None:
             self.config[search_id]['name'] = name
         if criteria is not None:
             self.config[search_id]['criteria'] = criteria
         if notify is not None:
             self.config[search_id]['notify'] = notify
-        
+
         self._save_config()
         return True
+
+    def delete_search(self, search_id):
+        """
+        Delete a saved search
+        """
+        if search_id in self.config:
+            del self.config[search_id]
+            self._save_config()
+            return True
+        return False
