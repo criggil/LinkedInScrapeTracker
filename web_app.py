@@ -57,9 +57,11 @@ def edit_search(search_id):
 
         criteria = {'type': search_type}
         if search_type == 'user':
-            criteria['usernames'] = request.form['usernames'].split(',')
+            usernames = request.form.get('usernames', '').strip()
+            criteria['usernames'] = [u.strip() for u in usernames.split(',') if u.strip()]
         else:
-            criteria['keywords'] = request.form['keywords'].split(',')
+            keywords = request.form.get('keywords', '').strip()
+            criteria['keywords'] = [k.strip() for k in keywords.split(',') if k.strip()]
 
         config_manager.update_search(search_id, name=name, criteria=criteria, notify=notify)
         flash('Search updated successfully!', 'success')

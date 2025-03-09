@@ -33,36 +33,5 @@
       ]
     },
     "notify": true
-  },
-  "ce28f51e-e991-405c-9a17-2eedcac332da": {
-    "name": "Design freelance",
-    "criteria": {
-      "type": "job",
-      "keywords": [
-        "designer",
-        " freelancer"
-      ]
-    },
-    "notify": true
-  },
-  "167be7d3-68fa-40c3-8daf-2bbf40124fc1": {
-    "name": "Marketing",
-    "criteria": {
-      "type": "job",
-      "keywords": [
-        "marketing"
-      ]
-    },
-    "notify": true
-  },
-  "007d9821-139b-4c28-9fb3-8d80c09aedc9": {
-    "name": "article",
-    "criteria": {
-      "type": "topic",
-      "keywords": [
-        "article"
-      ]
-    },
-    "notify": true
   }
 }

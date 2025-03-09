@@ -10,8 +10,8 @@ class PostFilter:
             if self._matches_criteria(post, criteria):
                 matches.append({
                     'id': post.get('id', ''),
-                    'author': post.get('author', ''),  # Changed from 'title' to 'author'
-                    'content': post.get('content', ''),  # Changed from 'post_text' to 'content'
+                    'author': post.get('author', ''),
+                    'content': post.get('content', ''),
                     'timestamp': post.get('timestamp', '')
                 })
 
@@ -27,8 +27,14 @@ class PostFilter:
 
         elif criteria['type'] == 'topic' or criteria['type'] == 'job':
             content = post.get('content', '').lower()  # Changed from 'post_text' to 'content'
+            keywords = criteria.get('keywords', [])
+
+            # For job searches, include default job-related keywords
+            if criteria['type'] == 'job':
+                keywords = list(keywords) + ['hiring', 'looking for', 'job opportunity']
+
             return any(keyword.lower().strip() in content 
-                      for keyword in criteria['keywords'])
+                      for keyword in keywords)
 
         return False
 
