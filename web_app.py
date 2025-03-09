@@ -93,8 +93,8 @@ def search():
             posts = load_sample_posts()
             matches = post_filter.filter_posts(posts, search['criteria'])
 
-            # Save matches
-            storage.save_matches(search_id, matches)
+            # Replace existing matches with new ones
+            storage.save_matches(search_id, matches, replace=True)
 
             # Redirect to view matches
             return redirect(url_for('view_matches', search_id=search_id))
