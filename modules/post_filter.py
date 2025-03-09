@@ -10,9 +10,9 @@ class PostFilter:
             if self._matches_criteria(post, criteria):
                 matches.append({
                     'id': post.get('id', ''),
-                    'author': post.get('title', ''),  # Using 'title' as author name
-                    'content': post.get('post_text', ''),  # Using 'post_text' as content
-                    'timestamp': post.get('date_posted', '')
+                    'author': post.get('author', ''),  # Changed from 'title' to 'author'
+                    'content': post.get('content', ''),  # Changed from 'post_text' to 'content'
+                    'timestamp': post.get('timestamp', '')
                 })
 
         return matches
@@ -22,11 +22,11 @@ class PostFilter:
         Check if a post matches the given criteria
         """
         if criteria['type'] == 'user':
-            return any(username.lower().strip() in post.get('title', '').lower() 
+            return any(username.lower().strip() in post.get('author', '').lower() 
                       for username in criteria['usernames'])
 
         elif criteria['type'] == 'topic' or criteria['type'] == 'job':
-            content = post.get('post_text', '').lower()
+            content = post.get('content', '').lower()  # Changed from 'post_text' to 'content'
             return any(keyword.lower().strip() in content 
                       for keyword in criteria['keywords'])
 
