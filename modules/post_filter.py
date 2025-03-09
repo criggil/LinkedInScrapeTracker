@@ -9,10 +9,10 @@ class PostFilter:
         for post in posts:
             if self._matches_criteria(post, criteria):
                 matches.append({
-                    'id': post.get('id', ''),
-                    'author': post.get('author', '') or post.get('user_id', ''),
-                    'content': post.get('content', '') or post.get('post_text', ''),
-                    'timestamp': post.get('timestamp', '') or post.get('date_posted', '')
+                    'id': post['id'],
+                    'author': post['author'],
+                    'content': post['content'],
+                    'timestamp': post['timestamp']
                 })
 
         return matches
@@ -22,13 +22,11 @@ class PostFilter:
         Check if a post matches the given criteria
         """
         if criteria['type'] == 'user':
-            author = post.get('author', '') or post.get('user_id', '')
-            return any(username.lower().strip() in author.lower() 
+            return any(username.lower().strip() in post['author'].lower() 
                       for username in criteria['usernames'])
 
         elif criteria['type'] == 'topic' or criteria['type'] == 'job':
-            # Get content from either field
-            content = (post.get('content', '') or post.get('post_text', '') or '').lower()
+            content = post['content'].lower()
             keywords = criteria.get('keywords', [])
 
             # For job searches, include default job-related keywords
