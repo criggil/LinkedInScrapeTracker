@@ -10,9 +10,9 @@ class PostFilter:
             if self._matches_criteria(post, criteria):
                 matches.append({
                     'id': post.get('id', ''),
-                    'author': post.get('author', ''),
-                    'content': post.get('content', '') or post.get('post_text', ''),  # Try both field names
-                    'timestamp': post.get('timestamp', '') or post.get('date_posted', '')  # Try both field names
+                    'author': post.get('author', '') or post.get('user_id', ''),
+                    'content': post.get('content', '') or post.get('post_text', ''),
+                    'timestamp': post.get('timestamp', '') or post.get('date_posted', '')
                 })
 
         return matches
@@ -22,11 +22,12 @@ class PostFilter:
         Check if a post matches the given criteria
         """
         if criteria['type'] == 'user':
-            return any(username.lower().strip() in post.get('author', '').lower() 
+            author = post.get('author', '') or post.get('user_id', '')
+            return any(username.lower().strip() in author.lower() 
                       for username in criteria['usernames'])
 
         elif criteria['type'] == 'topic' or criteria['type'] == 'job':
-            # Try both possible content field names
+            # Get content from either field
             content = (post.get('content', '') or post.get('post_text', '') or '').lower()
             keywords = criteria.get('keywords', [])
 
@@ -34,21 +35,15 @@ class PostFilter:
             if criteria['type'] == 'job':
                 keywords = list(keywords) + ['hiring', 'looking for', 'job opportunity']
 
-            # Print debug information for keywords and content
+            # Print debug information
             print(f"Keywords to match: {keywords}")
-            print(f"Post content: {content}")
+            print(f"Post content: {content[:100]}...")  # Print first 100 chars for readability
 
-            matches = [kw for kw in keywords if kw.lower().strip() in content]
-            if matches:
-                print(f"Matched keywords: {matches}")
+            matched_keywords = [kw for kw in keywords if kw.lower().strip() in content]
+            if matched_keywords:
+                print(f"Matched keywords: {matched_keywords}")
+                return True
 
-            return bool(matches)
+            return False
 
         return False
-
-    def _contains_keywords(self, text, keywords):
-        """
-        Check if text contains any of the keywords
-        """
-        text = text.lower()
-        return any(keyword.lower().strip() in text for keyword in keywords)

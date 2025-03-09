@@ -21,18 +21,31 @@ def load_sample_posts():
             data = json.load(f)
             posts.extend(data.get('posts', []))
 
-        # Load json_posts_test.json
+        # Load attached_assets/json_posts_test.json
         with open('attached_assets/json_posts_test.json', 'r') as f:
             data = json.load(f)
-            # Check if there are posts in the data
-            if isinstance(data, dict) and 'posts' in data:
-                posts.extend(data['posts'])
-            # If the file contains a list of posts directly
+            if isinstance(data, dict) and 'post_text_html' in data:
+                # Single post format
+                posts.append({
+                    'id': data.get('id', ''),
+                    'author': data.get('user_id', ''),
+                    'content': data.get('post_text', ''),
+                    'timestamp': data.get('date_posted', '')
+                })
             elif isinstance(data, list):
-                posts.extend(data)
+                for post in data:
+                    if 'post_text_html' in post:
+                        posts.append({
+                            'id': post.get('id', ''),
+                            'author': post.get('user_id', ''),
+                            'content': post.get('post_text', ''),
+                            'timestamp': post.get('date_posted', '')
+                        })
 
     except Exception as e:
         print(f"Error loading posts: {e}")
+        import traceback
+        print(traceback.format_exc())
 
     print(f"Total posts loaded: {len(posts)}")
     return posts
