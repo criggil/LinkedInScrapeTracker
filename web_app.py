@@ -11,13 +11,31 @@ storage = Storage()
 post_filter = PostFilter()
 
 def load_sample_posts():
+    """
+    Load and combine posts from both sample files
+    """
+    posts = []
     try:
+        # Load sample_posts.json
         with open('sample_posts.json', 'r') as f:
             data = json.load(f)
-            return data.get('posts', [])
+            posts.extend(data.get('posts', []))
+
+        # Load json_posts_test.json
+        with open('attached_assets/json_posts_test.json', 'r') as f:
+            data = json.load(f)
+            # Check if there are posts in the data
+            if isinstance(data, dict) and 'posts' in data:
+                posts.extend(data['posts'])
+            # If the file contains a list of posts directly
+            elif isinstance(data, list):
+                posts.extend(data)
+
     except Exception as e:
-        print(f"Error loading sample posts: {e}")
-        return []
+        print(f"Error loading posts: {e}")
+
+    print(f"Total posts loaded: {len(posts)}")
+    return posts
 
 @app.route('/')
 def index():

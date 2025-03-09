@@ -11,8 +11,8 @@ class PostFilter:
                 matches.append({
                     'id': post.get('id', ''),
                     'author': post.get('author', ''),
-                    'content': post.get('content', ''),
-                    'timestamp': post.get('timestamp', '')
+                    'content': post.get('content', '') or post.get('post_text', ''),  # Try both field names
+                    'timestamp': post.get('timestamp', '') or post.get('date_posted', '')  # Try both field names
                 })
 
         return matches
@@ -26,7 +26,8 @@ class PostFilter:
                       for username in criteria['usernames'])
 
         elif criteria['type'] == 'topic' or criteria['type'] == 'job':
-            content = post.get('content', '').lower()  # Changed from 'post_text' to 'content'
+            # Try both possible content field names
+            content = (post.get('content', '') or post.get('post_text', '') or '').lower()
             keywords = criteria.get('keywords', [])
 
             # For job searches, include default job-related keywords
