@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Add New Search</h2>
+<form method="POST">
+    <div class="form-group">
+        <label for="name">Search Name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="type">Search Type:</label>
+        <select id="type" name="type" required onchange="toggleFields()">
+            <option value="user">User</option>
+            <option value="topic">Topic</option>
+            <option value="job">Job</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="usernames-group">
+        <label for="usernames">Usernames (comma-separated):</label>
+        <input type="text" id="usernames" name="usernames">
+    </div>
+    
+    <div class="form-group" id="keywords-group" style="display: none;">
+        <label for="keywords">Keywords (comma-separated):</label>
+        <input type="text" id="keywords" name="keywords">
+    </div>
+    
+    <div class="form-group">
+        <label>
+            <input type="checkbox" name="notify" checked>
+            Enable notifications
+        </label>
+    </div>
+    
+    <button type="submit" class="btn">Add Search</button>
+</form>
+
+<script>
+function toggleFields() {
+    const type = document.getElementById('type').value;
+    const usernamesGroup = document.getElementById('usernames-group');
+    const keywordsGroup = document.getElementById('keywords-group');
+    
+    if (type === 'user') {
+        usernamesGroup.style.display = 'block';
+        keywordsGroup.style.display = 'none';
+        document.getElementById('usernames').required = true;
+        document.getElementById('keywords').required = false;
+    } else {
+        usernamesGroup.style.display = 'none';
+        keywordsGroup.style.display = 'block';
+        document.getElementById('usernames').required = false;
+        document.getElementById('keywords').required = true;
+    }
+}
+</script>
+{% endblock %}

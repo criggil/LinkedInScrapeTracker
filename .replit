@@ -15,6 +15,10 @@ author = "agent"
 task = "workflow.run"
 args = "LinkedIn Monitor"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Flask Server"
+
 [[workflows.workflow]]
 name = "LinkedIn Monitor"
 author = "agent"
@@ -29,5 +33,24 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "python3 linkedin_monitor.py --list-searches"
 
+[[workflows.workflow]]
+name = "Flask Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python3 web_app.py"
+waitForPort = 5000
+
 [deployment]
 run = ["sh", "-c", "python3 linkedin_monitor.py --list-searches"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80

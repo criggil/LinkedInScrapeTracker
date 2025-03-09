@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Matches for: {{ search.name }}</h2>
+<p><strong>Search Type:</strong> {{ search.criteria.type }}</p>
+{% if search.criteria.type == 'user' %}
+    <p><strong>Usernames:</strong> {{ search.criteria.usernames|join(', ') }}</p>
+{% else %}
+    <p><strong>Keywords:</strong> {{ search.criteria.keywords|join(', ') }}</p>
+{% endif %}
+
+{% if matches %}
+    {% for match in matches %}
+        <div class="match-item">
+            <p><strong>Post ID:</strong> {{ match.id }}</p>
+            <p><strong>Author:</strong> {{ match.author }}</p>
+            <p><strong>Content:</strong> {{ match.content }}</p>
+            <p><strong>Matched at:</strong> {{ match.matched_at }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No matches found for this search.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Saved Searches</h2>
+{% for id, search in searches.items() %}
+    <div class="search-item">
+        <h3>{{ search.name }}</h3>
+        <p><strong>Type:</strong> {{ search.criteria.type }}</p>
+        {% if search.criteria.type == 'user' %}
+            <p><strong>Usernames:</strong> {{ search.criteria.usernames|join(', ') }}</p>
+        {% else %}
+            <p><strong>Keywords:</strong> {{ search.criteria.keywords|join(', ') }}</p>
+        {% endif %}
+        <p><strong>Notifications:</strong> {{ 'Enabled' if search.notify else 'Disabled' }}</p>
+        <a href="{{ url_for('view_matches', search_id=id) }}" class="btn">View Matches</a>
+    </div>
+{% endfor %}
+{% endblock %}
