@@ -17,7 +17,8 @@
         "AI",
         "SEO",
         "joy",
-        "Positive"
+        "Positive",
+        "remote"
       ]
     },
     "notify": true
@@ -37,11 +38,22 @@
     "notify": true
   },
   "423c4d49-81af-4327-b729-77891ae510de": {
-    "name": "Positive",
+    "name": "Remote",
     "criteria": {
       "type": "topic",
       "keywords": [
-        "Positive"
+        "Remote",
+        "remote"
+      ]
+    },
+    "notify": true
+  },
+  "556b986a-fa1a-4456-9d79-2a9cda7e6490": {
+    "name": "Opportunity",
+    "criteria": {
+      "type": "topic",
+      "keywords": [
+        "opportunity"
       ]
     },
     "notify": true
