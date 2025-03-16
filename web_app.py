@@ -2,12 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 
 from modules.filters import Processor
 from modules.storage import DatabaseStorage
-from modules.post_filter import PostFilter
 import json
 
 app = Flask(__name__)
 storage = DatabaseStorage()
-post_filter = PostFilter()
 
 @app.route('/')
 def index():
