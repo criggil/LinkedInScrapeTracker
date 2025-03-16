@@ -6,7 +6,6 @@ from modules.post_filter import PostFilter
 import json
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Required for flash messages
 storage = DatabaseStorage()
 post_filter = PostFilter()
 
