@@ -144,7 +144,7 @@ session.commit()
 search = Search(
     name="Product Launch",
     type="topic",
-    keyword="product launch",
+    keywords="product launch",
     notify=True
 )
 

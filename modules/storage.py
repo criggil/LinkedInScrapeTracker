@@ -57,7 +57,7 @@ class DatabaseStorage:
                 - id (int): The ID of the search (optional for new searches)
                 - name (str): The name of the search
                 - type (str): The type of search (user, company, topic, or job)
-                - keyword (str): Keywords or usernames
+                - keywords (str): Keywords or usernames
                 - notify (bool): Whether to notify on matches
 
         Returns:
@@ -77,8 +77,10 @@ class DatabaseStorage:
                         existing_search.name = search_data['name']
                     if 'type' in search_data:
                         existing_search.type = search_data['type']
-                    if 'keyword' in search_data:
-                        existing_search.keyword = search_data['keyword']
+                    if 'usernames' in search_data:
+                        existing_search.type = search_data['usernames']
+                    if 'keywords' in search_data:
+                        existing_search.keyword = search_data['keywords']
                     if 'notify' in search_data:
                         existing_search.notify = search_data['notify']
 
@@ -90,7 +92,8 @@ class DatabaseStorage:
                 id=search_data.get('id'),  # Will be None for new searches
                 name=search_data['name'],
                 type=search_data['type'],
-                keyword=search_data.get('keyword'),
+                usernames=search_data.get('usernames'),
+                keywords=search_data.get('keywords'),
                 notify=search_data.get('notify', False)
             )
 

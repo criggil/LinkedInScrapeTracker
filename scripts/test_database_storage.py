@@ -26,7 +26,7 @@ def main():
     search_data = {
         'name': 'Test Search',
         'type': 'topic',
-        'keyword': 'python,database,storage',
+        'keywords': 'python,database,storage',
         'notify': True
     }
     search_id = db_storage.save_search(search_data)
@@ -96,7 +96,7 @@ def main():
     search_data = {
         'name': 'Match Test Search',
         'type': 'topic',
-        'keyword': 'test,match',
+        'keywords': 'test,match',
         'notify': True
     }
     search_id = db_storage.save_search(search_data)

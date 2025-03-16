@@ -10,16 +10,10 @@ class Post(Base):
 
     id = Column(Integer, primary_key=True)
     post_url = Column(String(2048), unique=True, nullable=False)
-
     user_name = Column(String(255), unique=False, nullable=True)
     user_url = Column(String(2048), unique=False, nullable=True)
-
-    company_name = Column(String(255), unique=False, nullable=True)
-    company_url = Column(String(2048), unique=False, nullable=True)
-
     content = Column(Text, nullable=False)
     timestamp = Column(DateTime, nullable=False)
-
     likes = Column(Integer, default=0)
     comments = Column(Integer, default=0)
     shares = Column(Integer, default=0)
@@ -28,7 +22,7 @@ class Post(Base):
     matches = relationship("Match", back_populates="posts")
 
     def __repr__(self):
-        return f"<Post(id={self.id}, user_name={self.user_name}/company_name={self.company_name})>"
+        return f"<Post(id={self.id}, user_name={self.user_name})>"
 
 
 # Define the Searches table
@@ -38,7 +32,8 @@ class Search(Base):
     id = Column(Integer, primary_key=True)  # Changed from String to Integer
     name = Column(String(255), nullable=False)
     type = Column(String(50), nullable=False)  # Can be user, company, topic, or job
-    keyword = Column(Text, nullable=True)  # String to store keywords or usernames
+    usernames = Column(Text, nullable=True)
+    keywords = Column(Text, nullable=True)  # String to store keywords or usernames
     notify = Column(Boolean, default=False)
 
     matches = relationship("Match")

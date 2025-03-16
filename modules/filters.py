@@ -18,12 +18,13 @@ class Processor:
 
     def _match(self, post: Post, search: Search) -> bool:
         content = post.content.lower()
-        if search.type == "user":
-            user_names = search.keyword.split(',')
-            return any(username.lower().strip() in post.user_name.lower() for username in user_names)
+        if search.type == "user" and search.usernames:
+            user_names = search.usernames.split(',')
+            post_username = post.user_name if post.user_name else ""
+            return any(username.lower().strip() in post_username.lower() for username in user_names)
 
-        elif search.type == "topic" or search.type == "job":
-            keywords = search.keyword.split(',')
+        elif search.type == "topic" or search.type == "job" and search.keywords:
+            keywords = search.keywords.split(',')
             matched_keywords = [kw for kw in keywords if kw.lower().strip() in content]
             if matched_keywords:
                 print(f"Matched keywords: {matched_keywords}")

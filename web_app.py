@@ -5,6 +5,7 @@ from modules.storage import DatabaseStorage
 import json
 
 app = Flask(__name__)
+app.secret_key = 'your-secret-key-here'
 storage = DatabaseStorage()
 
 @app.route('/')
@@ -32,7 +33,7 @@ def add_search():
             "name": name,
             "type": search_type,
             "usernames": ', '.join(usernames) if usernames else None,
-            "keyword": ', '.join(keywords) if keywords else None,
+            "keywords": ', '.join(keywords) if keywords else None,
             "notify": notify
         }
         storage.save_search(search_data)
@@ -65,7 +66,7 @@ def edit_search(search_id):
             "id": search_id,
             "name": name,
             "type": search_type,
-            "keyword": json.dumps(criteria),
+            "keywords": json.dumps(criteria),
             "notify": notify
         }
         storage.save_search(search_data)
