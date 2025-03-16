@@ -12,23 +12,23 @@ class PostLoader:
         Generator that yields batches of posts to avoid loading entire file
         """
         current_batch = []
-        
+
         with open(self.file_path, 'r', encoding='utf-8') as f:
             # Skip the first line which is '['
             f.readline()
-            
+
             for line in f:
                 # Skip empty lines
                 if not line.strip():
                     continue
-                    
+
                 # Remove trailing comma if present
                 line = line.rstrip(',\n')
-                
+
                 # Skip the last line which is ']'
                 if line == ']':
                     continue
-                    
+
                 try:
                     post = json.loads(line)
                     # Extract only needed fields
@@ -39,14 +39,14 @@ class PostLoader:
                         'timestamp': post.get('date_posted', '')
                     }
                     current_batch.append(simplified_post)
-                    
+
                     if len(current_batch) >= self.batch_size:
                         yield current_batch
                         current_batch = []
                 except json.JSONDecodeError:
                     print(f"Skipping invalid JSON line")
                     continue
-            
+
             # Yield remaining posts
             if current_batch:
                 yield current_batch
@@ -71,16 +71,24 @@ class PostLoader:
         if criteria['type'] == 'user':
             return any(username.lower().strip() in post['author'].lower() 
                       for username in criteria['usernames'])
-        
+
         elif criteria['type'] in ['topic', 'job']:
             content = post['content'].lower()
             keywords = criteria.get('keywords', [])
-            
+
             # For job searches, include default job-related keywords
             if criteria['type'] == 'job':
                 keywords = list(keywords) + ['hiring', 'looking for', 'job opportunity']
-            
-            return any(keyword.lower().strip() in content 
-                      for keyword in keywords)
-        
+
+            # Print debug information
+            print(f"Keywords to match: {keywords}")
+            print(f"Post content: {content[:100]}...")  # Print first 100 chars for readability
+
+            matched_keywords = [kw for kw in keywords if kw.lower().strip() in content]
+            if matched_keywords:
+                print(f"Matched keywords: {matched_keywords}")
+                return True
+
+            return False
+
         return False
