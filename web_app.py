@@ -1,30 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from modules.config_manager import ConfigManager
-from modules.storage import Storage
+
+from modules.filters import Processor
+from modules.storage import DatabaseStorage
 from modules.post_filter import PostFilter
 import json
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Required for flash messages
-config_manager = ConfigManager()
-storage = Storage()
+storage = DatabaseStorage()
 post_filter = PostFilter()
-
-def load_sample_posts():
-    """
-    Load and parse JSON file with error handling
-    """
-    try:
-        with open('sample_posts.json', 'r') as f:
-            data = json.load(f)
-            return data.get('posts', [])
-    except Exception as e:
-        print(f"Error loading sample posts: {e}")
-        return []
 
 @app.route('/')
 def index():
-    searches = config_manager.get_all_searches()
+    searches = storage.get_all_searches()
     return render_template('index.html', searches=searches)
 
 @app.route('/add_search', methods=['GET', 'POST'])
@@ -34,15 +22,23 @@ def add_search():
         search_type = request.form['type']
         notify = 'notify' in request.form
 
-        criteria = {'type': search_type}
+        usernames = []
+        keywords = []
         if search_type == 'user':
             usernames = request.form.get('usernames', '').strip()
-            criteria['usernames'] = [u.strip() for u in usernames.split(',') if u.strip()]
+            usernames = [u.strip() for u in usernames.split(',') if u.strip()]
         else:
             keywords = request.form.get('keywords', '').strip()
-            criteria['keywords'] = [k.strip() for k in keywords.split(',') if k.strip()]
+            keywords = [k.strip() for k in keywords.split(',') if k.strip()]
 
-        config_manager.add_search(name, criteria, notify)
+        search_data = {
+            "name": name,
+            "type": search_type,
+            "usernames": ', '.join(usernames) if usernames else None,
+            "keyword": ', '.join(keywords) if keywords else None,
+            "notify": notify
+        }
+        storage.save_search(search_data)
         flash('Search added successfully!', 'success')
         return redirect(url_for('index'))
 
@@ -50,7 +46,7 @@ def add_search():
 
 @app.route('/edit_search/<search_id>', methods=['GET', 'POST'])
 def edit_search(search_id):
-    search = config_manager.get_search(search_id)
+    search = storage.get_search(search_id)
     if not search:
         flash('Search not found!', 'error')
         return redirect(url_for('index'))
@@ -68,7 +64,14 @@ def edit_search(search_id):
             keywords = request.form.get('keywords', '').strip()
             criteria['keywords'] = [k.strip() for k in keywords.split(',') if k.strip()]
 
-        config_manager.update_search(search_id, name=name, criteria=criteria, notify=notify)
+        search_data = {
+            "id": search_id,
+            "name": name,
+            "type": search_type,
+            "keyword": json.dumps(criteria),
+            "notify": notify
+        }
+        storage.save_search(search_data)
         flash('Search updated successfully!', 'success')
         return redirect(url_for('index'))
 
@@ -76,7 +79,7 @@ def edit_search(search_id):
 
 @app.route('/delete_search/<search_id>')
 def delete_search(search_id):
-    if config_manager.delete_search(search_id):
+    if storage.delete_search(search_id):
         flash('Search deleted successfully!', 'success')
     else:
         flash('Error deleting search!', 'error')
@@ -84,33 +87,65 @@ def delete_search(search_id):
 
 @app.route('/view_matches/<search_id>')
 def view_matches(search_id):
-    search = config_manager.get_search(search_id)
-    matches = storage.get_matches(search_id)
-    return render_template('view_matches.html', search=search, matches=matches)
+    # Get pagination parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+
+    # Ensure per_page is either 10 or 20
+    if per_page not in [10, 20]:
+        per_page = 10
+
+    search = storage.get_search(search_id)
+    matches, total_matches = storage.get_matches_paginated(search_id, page=page, per_page=per_page)
+
+    # Calculate total pages
+    total_pages = (total_matches + per_page - 1) // per_page
+
+    return render_template('view_matches.html', 
+                          search=search, 
+                          matches=matches, 
+                          page=page, 
+                          per_page=per_page,
+                          total_matches=total_matches,
+                          total_pages=total_pages)
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
         search_id = request.form['search_id']
-        search = config_manager.get_search(search_id)
+        search = storage.get_search(search_id)
 
         if search:
-            posts = load_sample_posts()
-            # Print debug information
-            print(f"Search criteria: {search['criteria']}")
-            print(f"Number of posts to process: {len(posts)}")
-
-            matches = post_filter.filter_posts(posts, search['criteria'])
-            print(f"Number of matches found: {len(matches)}")
-
-            # Replace existing matches with new ones
-            storage.save_matches(search_id, matches, replace=True)
-
-            # Redirect to view matches
+            processor = Processor(storage)
+            posts = storage.get_all_posts()
+            processor.filter_by_search(posts, search)
             return redirect(url_for('view_matches', search_id=search_id))
 
-    searches = config_manager.get_all_searches()
+    searches = storage.get_all_searches()
     return render_template('search.html', searches=searches)
+
+@app.route('/posts')
+def posts():
+    # Get pagination parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+
+    # Ensure per_page is either 10 or 20
+    if per_page not in [10, 20]:
+        per_page = 10
+
+    # Get posts with pagination
+    posts, total_posts = storage.get_posts(page=page, per_page=per_page)
+
+    # Calculate total pages
+    total_pages = (total_posts + per_page - 1) // per_page
+
+    return render_template('posts.html', 
+                          posts=posts, 
+                          page=page, 
+                          per_page=per_page,
+                          total_posts=total_posts,
+                          total_pages=total_pages)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

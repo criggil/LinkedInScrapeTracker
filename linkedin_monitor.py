@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
 import argparse
 import json
-import sys
 from modules.post_filter import PostFilter
-from modules.storage import Storage
-from modules.config_manager import ConfigManager
+from modules.storage import DatabaseStorage
 
 def setup_argparse():
     parser = argparse.ArgumentParser(description='LinkedIn Post Monitor')
@@ -44,7 +41,7 @@ def load_json_file(file_path):
         print(f"Error loading input file: {str(e)}")
         return None
 
-def add_new_search(config_manager, args):
+def add_new_search(storage, args):
     if not args.name or not args.type:
         print("Error: --name and --type are required for adding a search")
         return
@@ -64,33 +61,39 @@ def add_new_search(config_manager, args):
         if args.type == "job":
             criteria["keywords"].extend(["hiring", "looking for", "job opportunity"])
 
-    search_id = config_manager.add_search(args.name, criteria, args.notify)
+    search_data = {
+        "name": args.name,
+        "type": args.type,
+        "keyword": json.dumps(criteria),
+        "notify": args.notify
+    }
+    search_id = storage.save_search(search_data)
     print(f"Saved search '{args.name}' added successfully! (ID: {search_id})")
 
 def main():
     parser = setup_argparse()
     args = parser.parse_args()
 
-    config_manager = ConfigManager()
-    storage = Storage()
+    storage = DatabaseStorage()
     post_filter = PostFilter()
 
     if args.add_search:
-        add_new_search(config_manager, args)
+        add_new_search(storage, args)
         return
 
     if args.list_searches:
-        searches = config_manager.get_all_searches()
+        searches = storage.get_all_searches()
         print("\n=== Saved Searches ===")
-        for search_id, search in searches.items():
-            print(f"\nID: {search_id}")
-            print(f"Name: {search['name']}")
-            print(f"Type: {search['criteria']['type']}")
-            if search['criteria']['type'] == 'user':
-                print(f"Usernames: {', '.join(search['criteria']['usernames'])}")
+        for search in searches:
+            criteria = json.loads(search.keyword) if search.keyword else {}
+            print(f"\nID: {search.id}")
+            print(f"Name: {search.name}")
+            print(f"Type: {search.type}")
+            if criteria.get('type') == 'user':
+                print(f"Usernames: {', '.join(criteria.get('usernames', []))}")
             else:
-                print(f"Keywords: {', '.join(search['criteria'].get('keywords', []))}")
-            print(f"Notifications: {'Enabled' if search['notify'] else 'Disabled'}")
+                print(f"Keywords: {', '.join(criteria.get('keywords', []))}")
+            print(f"Notifications: {'Enabled' if search.notify else 'Disabled'}")
         return
 
     if args.process:
@@ -102,13 +105,14 @@ def main():
         if not posts:
             return
 
-        searches = config_manager.get_all_searches()
-        for search_id, search in searches.items():
-            matches = post_filter.filter_posts(posts, search['criteria'])
+        searches = storage.get_all_searches()
+        for search in searches:
+            criteria = json.loads(search.keyword) if search.keyword else {}
+            matches = post_filter.filter_posts(posts, criteria)
             if matches:
-                storage.save_matches(search_id, matches)
-                if search['notify']:
-                    print(f"\nAlert! New matches for search '{search['name']}':")
+                storage.save_matches(search.id, matches)
+                if search.notify:
+                    print(f"\nAlert! New matches for search '{search.name}':")
                     for match in matches:
                         print(f"- {match['content'][:100]}...")
 

@@ -4,90 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkedIn Post Monitor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .search-item {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #0077b5;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .btn:hover {
-            background: #005582;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input[type="text"], select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .match-item {
-            background: #f9f9f9;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        nav {
-            margin-bottom: 20px;
-        }
-        .alert {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #dff0d8;
-            border-color: #d6e9c6;
-            color: #3c763d;
-        }
-        .alert-error {
-            background-color: #f2dede;
-            border-color: #ebccd1;
-            color: #a94442;
-        }
-        .button-group {
-            margin-top: 10px;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>LinkedIn Post Monitor</h1>
-        <nav>
-            <a href="{{ url_for('index') }}" class="btn">Home</a>
-            <a href="{{ url_for('add_search') }}" class="btn">Add New Search</a>
-            <a href="{{ url_for('search') }}" class="btn">Search Posts</a>
+<body class="bg-gray-100 p-5 font-sans">
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4">LinkedIn Post Monitor</h1>
+        <nav class="mb-6">
+            <a href="{{ url_for('index') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 hover:bg-blue-700">Home</a>
+            <a href="{{ url_for('add_search') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 hover:bg-blue-700">Add New Search</a>
+            <a href="{{ url_for('search') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 hover:bg-blue-700">Search Posts</a>
+            <a href="{{ url_for('posts') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 hover:bg-blue-700">View All Posts</a>
         </nav>
         <main>
             {% block content %}{% endblock %}

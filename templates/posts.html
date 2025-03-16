@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-xl font-semibold mb-4">LinkedIn Posts</h2>
+
+<div class="mb-4">
+    <form method="GET" action="{{ url_for('posts') }}" class="flex items-center">
+        <label for="per_page" class="mr-2">Posts per page:</label>
+        <select name="per_page" id="per_page" class="border rounded px-2 py-1 mr-4" onchange="this.form.submit()">
+            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+            <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+        </select>
+        <input type="hidden" name="page" value="1">
+    </form>
+</div>
+
+{% if posts %}
+    {% for post in posts %}
+        <div class="bg-gray-50 p-4 mb-4 rounded-md">
+            <div class="flex justify-between mb-2">
+                <div>
+                    {% if post.user_name %}
+                        <p class="font-semibold">{{ post.user_name }}</p>
+                    {% elif post.company_name %}
+                        <p class="font-semibold">{{ post.company_name }}</p>
+                    {% endif %}
+                </div>
+                <div class="text-gray-500 text-sm">
+                    {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+            </div>
+            <p class="mb-3">{{ post.content }}</p>
+            <div class="flex text-sm text-gray-600">
+                <p class="mr-4">❤️ {{ post.likes }}</p>
+                <p class="mr-4">💬 {{ post.comments }}</p>
+                <p>🔄 {{ post.shares }}</p>
+            </div>
+            {% if post.post_url %}
+                <div class="mt-2">
+                    <a href="{{ post.post_url }}" target="_blank" class="text-blue-600 hover:underline">View on LinkedIn</a>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <!-- Pagination controls -->
+    <div class="mt-6">
+        <div class="flex justify-between items-center">
+            <div>
+                Showing posts {{ (page - 1) * per_page + 1 }} to 
+                {% if page * per_page > total_posts %}
+                    {{ total_posts }}
+                {% else %}
+                    {{ page * per_page }}
+                {% endif %} 
+                of {{ total_posts }} total
+            </div>
+
+            <div class="flex items-center">
+                {% if page > 1 %}
+                    <a href="?page=1&per_page={{ per_page }}" class="px-3 py-1 bg-gray-200 rounded mr-2 hover:bg-gray-300">First</a>
+                    <a href="?page={{ page - 1 }}&per_page={{ per_page }}" class="px-3 py-1 bg-gray-200 rounded mr-2 hover:bg-gray-300">Previous</a>
+                {% endif %}
+
+                <span class="mx-2">Page {{ page }} of {{ total_pages }}</span>
+
+                {% if page < total_pages %}
+                    <a href="?page={{ page + 1 }}&per_page={{ per_page }}" class="px-3 py-1 bg-gray-200 rounded ml-2 hover:bg-gray-300">Next</a>
+                    <a href="?page={{ total_pages }}&per_page={{ per_page }}" class="px-3 py-1 bg-gray-200 rounded ml-2 hover:bg-gray-300">Last</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    <p class="italic text-gray-600">No posts found.</p>
+{% endif %}
+{% endblock %}
