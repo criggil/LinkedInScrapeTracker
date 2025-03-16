@@ -14,42 +14,40 @@ class PostLoader:
         current_batch = []
 
         with open(self.file_path, 'r', encoding='utf-8') as f:
-            # Skip the first line which is '['
-            f.readline()
+            try:
+                # Read the entire file content
+                content = f.read()
+                # Parse JSON content
+                if content.startswith('\ufeff'):  # Remove BOM if present
+                    content = content[1:]
+                data = json.loads(content)
 
-            for line in f:
-                # Skip empty lines
-                if not line.strip():
-                    continue
+                # Process posts
+                for post in data:
+                    try:
+                        simplified_post = {
+                            'id': str(post['id']),
+                            'author': post['user_id'],
+                            'content': post['post_text'],
+                            'timestamp': post['date_posted']
+                        }
+                        current_batch.append(simplified_post)
 
-                # Remove trailing comma if present
-                line = line.rstrip(',\n')
+                        if len(current_batch) >= self.batch_size:
+                            yield current_batch
+                            current_batch = []
+                    except KeyError as e:
+                        print(f"Skipping post due to missing field: {e}")
+                        continue
 
-                # Skip the last line which is ']'
-                if line == ']':
-                    continue
+                # Yield remaining posts
+                if current_batch:
+                    yield current_batch
 
-                try:
-                    post = json.loads(line)
-                    # Extract only needed fields
-                    simplified_post = {
-                        'id': str(post.get('id', '')),
-                        'author': post.get('user_id', ''),
-                        'content': post.get('post_text', ''),
-                        'timestamp': post.get('date_posted', '')
-                    }
-                    current_batch.append(simplified_post)
-
-                    if len(current_batch) >= self.batch_size:
-                        yield current_batch
-                        current_batch = []
-                except json.JSONDecodeError:
-                    print(f"Skipping invalid JSON line")
-                    continue
-
-            # Yield remaining posts
-            if current_batch:
-                yield current_batch
+            except json.JSONDecodeError as e:
+                print(f"Error parsing JSON: {e}")
+            except Exception as e:
+                print(f"Unexpected error: {e}")
 
     def search_posts(self, criteria: Dict, max_results: int = 100) -> List[Dict]:
         """
