@@ -273,16 +273,55 @@ class DatabaseStorage:
 
         return count
 
-    def get_all_posts(self):
+    def get_post_ids_by_keywords(self, keywords: list[str]):
         """
-        Get all saved posts from the database
+        Fetches the IDs of posts containing any of the provided keywords in their content.
+
+        The method performs a case-insensitive search for the specified keywords in the
+        content of posts stored in the database. It constructs a list of filters to
+        match posts where the content contains any of the keywords. It then retrieves
+        the IDs of all matching posts and returns them as a list.
+
+        Parameters:
+        keywords:
+            list of str
+            A list of keywords to search for in the content of the posts.
 
         Returns:
-            list: A list of Post objects
+        list of int
+            A list of IDs of posts that contain the specified keywords in their content.
+
+        Raises:
+        None
         """
         session = self.Session()
         try:
-            return session.query(Post).all()
+            filters = [Post.content.ilike(f"%{keyword}%") for keyword in keywords]  # ilike for case-insensitive search
+            post_ids = session.query(Post.id).filter(*filters).all()  # *filters unpacks the list of filters
+            return [post_id[0] for post_id in post_ids]
+        finally:
+            session.close()
+
+    def get_post_ids_by_users(self, usernames: list[str]):
+        """
+        Fetches the IDs of posts made by specified users.
+
+        This method retrieves a list of post IDs for the users whose usernames are
+        provided as input. It performs a database query to filter posts by the given
+        usernames and extracts the corresponding post IDs. The method ensures that
+        the database session is properly closed after execution.
+
+        Args:
+            usernames (list[str]): A list of usernames for which to fetch post IDs.
+
+        Returns:
+            list[int]: A list of integers representing the IDs of the posts made by
+            the specified users.
+        """
+        session = self.Session()
+        try:
+            post_ids = session.query(Post.id).filter(Post.user_name.in_(usernames)).all()
+            return [post_id[0] for post_id in post_ids]
         finally:
             session.close()
 

@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 
-from modules.filters import Processor
 from modules.storage import DatabaseStorage
 import json
 
@@ -110,13 +111,26 @@ def view_matches(search_id):
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
-        search_id = request.form['search_id']
+        search_id = int(request.form['search_id'])
         search = storage.get_search(search_id)
 
         if search:
-            processor = Processor(storage)
-            posts = storage.get_all_posts()
-            processor.filter_by_search(posts, search)
+            matched_post_ids = None
+            if search.type == 'user' and search.usernames:
+                usernames = search.usernames.split(',')
+                matched_post_ids = storage.get_post_ids_by_users(usernames)
+            elif (search.type == 'topic' or search.type == 'job') and search.keywords:
+                keywords = search.keywords.split(',')
+                matched_post_ids = storage.get_post_ids_by_users(keywords)
+
+            if matched_post_ids:
+                matches = list(map(lambda post_id: {
+                    "search_id": search.id,
+                    "post_id": post_id,
+                    "matched_at": datetime.now()
+                }, matched_post_ids))
+                storage.save_matches(search.id, matches, True)
+
             return redirect(url_for('view_matches', search_id=search_id))
 
     searches = storage.get_all_searches()
